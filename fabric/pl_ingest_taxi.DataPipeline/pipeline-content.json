@@ -1,0 +1,92 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "BinarySource",
+            "formatSettings": {
+              "type": "BinaryReadSettings"
+            },
+            "storeSettings": {
+              "type": "HttpReadSettings",
+              "requestMethod": "GET"
+            },
+            "datasetSettings": {
+              "type": "Binary",
+              "typeProperties": {
+                "location": {
+                  "type": "HttpServerLocation",
+                  "relativeUrl": {
+                    "value": "@concat(pipeline().parameters.taxi_type, '_tripdata_', pipeline().parameters.year_month, '.parquet')",
+                    "type": "Expression"
+                  }
+                }
+              },
+              "externalReferences": {
+                "connection": "aba7227f-d0b9-45e5-ad11-015d48500475"
+              },
+              "annotations": []
+            }
+          },
+          "sink": {
+            "type": "BinarySink",
+            "storeSettings": {
+              "type": "LakehouseWriteSettings"
+            },
+            "datasetSettings": {
+              "type": "Binary",
+              "typeProperties": {
+                "location": {
+                  "type": "LakehouseLocation",
+                  "folderPath": {
+                    "value": "@concat('taxi/',pipeline().parameters.taxi_type)",
+                    "type": "Expression"
+                  },
+                  "fileName": {
+                    "value": "@concat(pipeline().parameters.taxi_type, '_tripdata_', pipeline().parameters.year_month, '.parquet')",
+                    "type": "Expression"
+                  }
+                }
+              },
+              "linkedService": {
+                "name": "lh_bronze",
+                "properties": {
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "artifactId": "6b0710a0-9346-8586-4179-cdc1a35f70db",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000",
+                    "rootFolder": "Files"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "enableStaging": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "copy_taxi_file",
+        "dependsOn": []
+      }
+    ],
+    "parameters": {
+      "taxi_type": {
+        "type": "string",
+        "defaultValue": "yellow"
+      },
+      "year_month": {
+        "type": "string",
+        "defaultValue": "2026-09"
+      }
+    }
+  }
+}
